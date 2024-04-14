@@ -29,20 +29,17 @@ func main() {
 	fmt.Println(fibonacci)
 	fmt.Println(fibFrequency.frequency)
 	times := make([]float64, 0)
-	for i := 10; i <= 30; i++ {
-		calculateFunctionTime(&times, "Fibonacci "+strconv.Itoa(i), calculateFib, int64(i))
-	}
-	var avg float64
-	var sum float64
-	for i := 0; i < len(times)-1; i++ {
-		sum += times[i+1] / times[i]
-	}
-	avg = sum / float64(len(times))
-	fmt.Printf("Avg: %f\n", avg)
-	calculateFunctionTime(&times, "Fib 40", calculateFib, int64(40))
-	prediction := times[20] * math.Pow(avg, float64(10))
-	fmt.Printf("Predicted 40 %.2f\n", prediction)
-	fmt.Printf("Accuracy: %f\n", prediction/times[21])
+	start, end := 10, 30
+	fibAvg := calculateExponentailRateFib(&times, start, end)
+	makePredictions(40, fibAvg, int64(end), &times)
+	makePredictions(100, fibAvg, int64(end), &times)
+	makePredictions(strongNumber, fibAvg, int64(end), &times)
+	result := ackermann(3, 4)
+	times = make([]float64, 0)
+	ackAvg := calculateExponentailRateAck(&times, 1, 3)
+	fmt.Println("Ackermann(3, 4) =", result)
+	fmt.Println(ackAvg)
+	makePredictions(10, ackAvg, 3, &times)
 }
 
 func stripPolishLetters(nick *string) {
@@ -159,4 +156,78 @@ func calculateFunctionTime(times *[]float64, functionName string, f interface{},
 
 	defer timeTrack(time.Now(), functionName, times)
 	fValue.Call(argValues)
+}
+
+func formatDuration(seconds float64) string {
+	years := math.Floor(seconds / (365 * 24 * 60 * 60))
+	seconds -= years * 365 * 24 * 60 * 60
+	months := math.Floor(seconds / (30 * 24 * 60 * 60))
+	seconds -= months * 30 * 24 * 60 * 60
+	days := math.Floor(seconds / (24 * 60 * 60))
+	seconds -= days * 24 * 60 * 60
+	hours := math.Floor(seconds / (60 * 60))
+	seconds -= hours * 60 * 60
+	minutes := math.Floor(seconds / 60)
+	seconds -= minutes * 60
+
+	formatted := ""
+	if years > 0 {
+		formatted += fmt.Sprintf("%.0f years ", years)
+	}
+	if months > 0 {
+		formatted += fmt.Sprintf("%.0f months ", months)
+	}
+	if days > 0 {
+		formatted += fmt.Sprintf("%.0f days ", days)
+	}
+	if hours > 0 {
+		formatted += fmt.Sprintf("%.0f hours ", hours)
+	}
+	if minutes > 0 {
+		formatted += fmt.Sprintf("%.0f minutes ", minutes)
+	}
+	if seconds > 0 {
+		formatted += fmt.Sprintf("%.0f seconds", seconds)
+	}
+
+	return formatted
+}
+
+func calculateExponentailRateFib(times *[]float64, start, end int) float64 {
+	for i := start; i <= end; i++ {
+		calculateFunctionTime(times, "Fibonacci "+strconv.Itoa(i), calculateFib, int64(i))
+	}
+	var sum float64
+	for i := 0; i < len(*times)-1; i++ {
+		sum += (*times)[i+1] / (*times)[i]
+	}
+	return math.Ceil((sum/float64(len(*times)))*10) / 10
+}
+
+func makePredictions(predicting int64, avg float64, end int64, times *[]float64) {
+	fmt.Printf("Avg: %.1f\n", avg)
+	prediction := (*times)[len(*times)-1] * math.Pow(avg, float64(predicting-end))
+	fmt.Printf("Predicted %d %s\n", predicting, formatDuration(prediction/1_000_000_000))
+}
+
+func ackermann(m, n int) int {
+	if m == 0 {
+		return n + 1
+	} else if m > 0 && n == 0 {
+		return ackermann(m-1, 1)
+	} else if m > 0 && n > 0 {
+		return ackermann(m-1, ackermann(m, n-1))
+	}
+	return -1 // Invalid input
+}
+
+func calculateExponentailRateAck(times *[]float64, start, end int) float64 {
+	for i := start; i <= end; i++ {
+		calculateFunctionTime(times, "Ackermann "+strconv.Itoa(i)+" "+strconv.Itoa(i+1), ackermann, i, i+1)
+	}
+	var sum float64
+	for i := 0; i < len(*times)-1; i++ {
+		sum += (*times)[i+1] / (*times)[i]
+	}
+	return math.Ceil((sum/float64(len(*times)))*10) / 10
 }
