@@ -16,18 +16,26 @@ type FibFrequency struct {
 }
 
 func main() {
-	nick := "DawRos"
+	// Format nickname
+	name := "Dawid"
+	surname := "Roszman"
+	nick := name[:3] + surname[:3]
 	stripPolishLetters(&nick)
 	makeLowercase(&nick)
 	asciiNumbers := wordToAsciiNumbers(nick)
 	fmt.Println(nick)
 	fmt.Println(asciiNumbers)
+
+	// Calculate Strong number
 	strongNumber := searchForFactorialContainingAllAscii(asciiNumbers)
 	fmt.Println(strongNumber)
+
+	// Calculate Fibonacci Frequency
 	fibFrequency := &FibFrequency{make(map[int64]int64), 30}
 	fibonacci := calculateCallsInFibonacci(fibFrequency.n, fibFrequency)
 	fmt.Println(fibonacci)
 	fmt.Println(fibFrequency.frequency)
+
 	times := make([]float64, 0)
 	start, end := 10, 30
 	fibAvg := calculateExponentailRateFib(&times, start, end)
