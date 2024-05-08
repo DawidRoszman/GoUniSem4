@@ -11,7 +11,7 @@ import (
 	"github.com/go-echarts/go-echarts/v2/opts"
 )
 
-var EMPTY, TREE, OLD_TREE, FIRE = "  ", "🌲", "🌳", "🔥"
+var EMPTY, TREE, OLD_TREE, FIRE, LIGHTNING = "  ", "🌲", "🌳", "🔥", "🗲"
 
 type Coordinates struct {
 	x, y int
@@ -40,6 +40,8 @@ func (f Forest) String() string {
 	for i := range f {
 		for j := range f[i] {
 			switch f[i][j].symbol {
+			case 3:
+				result += fmt.Sprint(LIGHTNING)
 			case 2:
 				result += fmt.Sprint(FIRE)
 			case 1:
@@ -118,6 +120,7 @@ func (f *Forest) findAdjacentTrees(coordinates Coordinates) []Coordinates {
 // }
 
 func (f *Forest) burnAdjacent(coordinates Coordinates, t time.Duration, display bool) {
+	(*f)[coordinates.x][coordinates.y] = Spot{3, false}
 	queue := []Coordinates{coordinates}
 
 	for len(queue) > 0 {
@@ -132,7 +135,7 @@ func (f *Forest) burnAdjacent(coordinates Coordinates, t time.Duration, display 
 					(*f)[x][y].symbol = 2
 				} else {
 					willBurn := rand.Intn(100)
-					if willBurn > 60 {
+					if willBurn > 50 {
 						(*f)[x][y].symbol = 2
 					} else {
 						continue
@@ -165,11 +168,11 @@ func (f *Forest) checkState() float32 {
 }
 
 func getThundarCoordinates(width, height int) Coordinates {
-	return Coordinates{rand.Intn(width), rand.Intn(height)}
+	return Coordinates{rand.Intn(height), rand.Intn(width)}
 }
 
 func testOptimalAfforestation() (int, float32) {
-	forestWidth, forestHeight := 26, 16
+	forestWidth, forestHeight := 100, 100
 	burntTreesPercentage := map[int]float32{}
 	for j := 0; j < 100; j += 1 {
 		forestPopulation := rand.Intn(100)
@@ -235,13 +238,13 @@ func findMinInMap(mapToCheck map[int]float32) (int, float32) {
 
 func main() {
 	forest := Forest{}
-	forest.createForest(26, 16)
-	forest.populateForest(40)
+	forest.createForest(30, 30)
+	forest.populateForest(50)
 	fmt.Println(forest)
-	forest.burnAdjacent(getThundarCoordinates(26, 16), time.Millisecond*200, true)
+	forest.burnAdjacent(getThundarCoordinates(30, 30), time.Millisecond*100, true)
 	fmt.Printf("Trees burnt: %.2f %%\n", forest.checkState()*100)
 
 	minKey, minVal := testOptimalAfforestation()
 
-	fmt.Printf("Optimal afforestation is %d %% with %.2f %% burnt trees\n", minKey, minVal*100)
+	fmt.Printf("Optimal afforestation is %d%% with %.2f%% burnt trees\n", minKey, minVal*100)
 }
