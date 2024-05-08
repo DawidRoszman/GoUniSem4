@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
-	"sort"
 	"time"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
 )
 
-var EMPTY, TREE, OLD_TREE, FIRE, LIGHTNING = "  ", "🌲", "🌳", "🔥", "🗲"
+var EMPTY, TREE, OLD_TREE, FIRE, LIGHTNING = "  ", "🌲", "🌳", "🔥", "🌩️"
 
 type Coordinates struct {
 	x, y int
@@ -151,6 +150,7 @@ func (f *Forest) burnAdjacent(coordinates Coordinates, t time.Duration, display 
 	}
 }
 
+// Checking how many trees have burnt
 func (f *Forest) checkState() float32 {
 	numOfFires, numOfTreesLeft := 0.0, 0.0
 	for row := range *f {
@@ -173,67 +173,65 @@ func getThundarCoordinates(width, height int) Coordinates {
 
 func testOptimalAfforestation() (int, float32) {
 	forestWidth, forestHeight := 100, 100
-	burntTreesPercentage := map[int]float32{}
-	for j := 0; j < 100; j += 1 {
-		forestPopulation := rand.Intn(100)
-		var forestState float32 = 0.0
-		for forestState == 0.0 {
+	treePercentage := make([]int, 20)
+	burnPercentage := make([]float32, 20)
+	// Simulating burning forest 100 times for tree coverage from 5 to 100, saving max burning percentage
+	for i := 0; i < 100; i += 1 {
+		for j := 0; j < 20; j += 1 {
+			forestPopulation := (j + 1) * 5
+			var forestState float32
 			forest := Forest{}
 			forest.createForest(forestWidth, forestHeight)
 			forest.populateForest(forestPopulation)
 			forest.burnAdjacent(getThundarCoordinates(forestWidth, forestHeight), time.Millisecond*0, false)
 			forestState = forest.checkState()
-			if burntTreesPercentage[forestPopulation] < forestState {
-				burntTreesPercentage[forestPopulation] = forestState
+			treePercentage[j] = forestPopulation
+			if burnPercentage[j] < forestState {
+				burnPercentage[j] = forestState
 			}
 		}
 	}
-	fmt.Println(burntTreesPercentage)
 
+	savePlot(burnPercentage, treePercentage)
+
+	minIdx := findMin(burnPercentage, treePercentage)
+	return treePercentage[minIdx], burnPercentage[minIdx]
+}
+
+func savePlot(burnPercentage []float32, treePercentage []int) {
 	bar := charts.NewBar()
 
-	// Set global options
 	bar.SetGlobalOptions(charts.WithTitleOpts(opts.Title{
 		Title:    "Forest",
 		Subtitle: "Optimal afforestation test",
 	}))
 
-	keys := make([]int, len(burntTreesPercentage))
+	series := make([]opts.BarData, 0)
 
-	vals := make([]opts.BarData, len(burntTreesPercentage))
-
-	i := 0
-	for key, val := range burntTreesPercentage {
-		keys[i] = key
-		vals[i] = opts.BarData{
-			Value: val * 100,
-		}
-		i += 1
+	for i := range burnPercentage {
+		series = append(series, opts.BarData{Value: burnPercentage[i] * 100})
 	}
-	sort.Ints(keys)
-	// Put data into instance
-	bar.SetXAxis(keys).
-		AddSeries("Burn percentage", vals)
+
+	bar.SetXAxis(treePercentage).
+		AddSeries("Burn percentage", series)
 	f, _ := os.Create("bar.html")
 	_ = bar.Render(f)
-
-	return findMinInMap(burntTreesPercentage)
 }
 
-func findMinInMap(mapToCheck map[int]float32) (int, float32) {
-	minKey := -1
-	var minVal float32 = -1.0
-	for key, val := range mapToCheck {
-		if minKey == -1 {
-			minKey = key
-			minVal = val
+func findMin(burnPercentage []float32, treePercentage []int) int {
+	minVal := (float32(treePercentage[0]) * 0.01) - burnPercentage[0]
+	fmt.Println(burnPercentage[0], treePercentage[0])
+	minValIdx := 0
+	for i := 0; i < len(burnPercentage); i++ {
+		currVal := (float32(treePercentage[i]) * 0.01) - burnPercentage[i]
+		if currVal > minVal {
+			minVal = currVal
+			minValIdx = i
 		}
-		if val < minVal {
-			minKey = key
-			minVal = val
-		}
+
 	}
-	return minKey, minVal
+
+	return minValIdx
 }
 
 func main() {
@@ -241,7 +239,7 @@ func main() {
 	forest.createForest(30, 30)
 	forest.populateForest(50)
 	fmt.Println(forest)
-	forest.burnAdjacent(getThundarCoordinates(30, 30), time.Millisecond*100, true)
+	forest.burnAdjacent(getThundarCoordinates(30, 30), time.Millisecond*50, true)
 	fmt.Printf("Trees burnt: %.2f %%\n", forest.checkState()*100)
 
 	minKey, minVal := testOptimalAfforestation()
