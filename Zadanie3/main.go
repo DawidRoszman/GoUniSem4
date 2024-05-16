@@ -22,32 +22,39 @@ type Record struct {
 }
 
 type RecordRequest struct {
-	Date     string `json:"date" binding:"required"`
-	Country  string `json:"country" binding:"required"`
-	Activity string `json:"activity" binding:"required"`
-	Name     string `json:"name" binding:"required"`
-	Injury   string `json:"injury" binding:"required"`
-	Species  string `json:"species" binding:"required"`
+	Date     string `form:"date" binding:"required"`
+	Country  string `form:"country" binding:"required"`
+	Activity string `form:"activity" binding:"required"`
+	Name     string `form:"name" binding:"required"`
+	Injury   string `form:"injury" binding:"required"`
+	Species  string `form:"species" binding:"required"`
 }
 type UpdateRecordRequest struct {
-	Date     string `json:"date"`
-	Country  string `json:"country"`
-	Activity string `json:"activity"`
-	Name     string `json:"name"`
-	Injury   string `json:"injury"`
-	Species  string `json:"species"`
+	Date     string `form:"date"`
+	Country  string `form:"country"`
+	Activity string `form:"activity"`
+	Name     string `form:"name"`
+	Injury   string `form:"injury"`
+	Species  string `form:"species"`
 }
 
 func setupRouter(data []Record) *gin.Engine {
 	r := gin.Default()
+	r.LoadHTMLGlob("./static/*")
+	r.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", gin.H{
+			"title": "Shark Atatcks",
+		})
+	})
 	r.GET("/shark", func(c *gin.Context) {
-		c.JSON(http.StatusOK, data)
+		c.HTML(http.StatusOK, "get_shark_template.html", gin.H{"Data": data})
 	})
 	r.POST("/shark", func(c *gin.Context) {
 		var requestBody RecordRequest
-		err := c.BindJSON(&requestBody)
+		err := c.Bind(&requestBody)
 		if err != nil {
 			c.String(400, err.Error())
+			return
 		}
 		data = append(data, Record{
 			requestBody.Date,
@@ -58,14 +65,17 @@ func setupRouter(data []Record) *gin.Engine {
 			requestBody.Species,
 			uuid.New(),
 		})
+		c.HTML(http.StatusOK, "get_shark_template.html", gin.H{"Data": data})
 	})
 	r.PUT("/shark/:id", func(c *gin.Context) {
 		id := c.Param("id")
 		var requestBody UpdateRecordRequest
-		err := c.BindJSON(&requestBody)
+		err := c.Bind(&requestBody)
 		if err != nil {
 			c.String(400, err.Error())
+			return
 		}
+		log.Println(requestBody.Name)
 		for record := range data {
 			if data[record].Id.String() == id {
 				if requestBody.Name != "" {
@@ -91,17 +101,24 @@ func setupRouter(data []Record) *gin.Engine {
 				}
 			}
 		}
+		c.HTML(http.StatusOK, "get_shark_template.html", gin.H{"Data": data})
 	})
 	r.DELETE("/shark/:id", func(c *gin.Context) {
 		id := c.Param("id")
 
 		for record := range data {
 			if data[record].Id.String() == id {
-				data = append(data[:record], data[record+1:]...)
+				data = remove(data, record)
+				c.HTML(http.StatusOK, "get_shark_template.html", gin.H{"Data": data})
+				return
 			}
 		}
 	})
 	return r
+}
+
+func remove(slice []Record, s int) []Record {
+	return append(slice[:s], slice[s+1:]...)
 }
 
 func importData() []Record {

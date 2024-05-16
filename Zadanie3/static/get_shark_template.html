@@ -1,0 +1,68 @@
+<ol>
+  {{ range $index, $record := .Data }}
+  <li>
+    <div class="attack">
+      <ul>
+        <li>Date: {{ $record.Date }}</li>
+        <li>Name: {{ $record.Name }}</li>
+        <li>Country: {{ $record.Country }}</li>
+        <li>Activity: {{ $record.Activity }}</li>
+        <li>Injury: {{ $record.Injury }}</li>
+        <li>Species: {{ $record.Species }}</li>
+      </ul>
+      <div>
+        <button
+          id="edit-element"
+          onclick="(function () {dialog = document.querySelector('#edit-dialog-{{ $record.Id }}');dialog.showModal();})()"
+          style="background-color: #f9e05e; color: black"
+        >
+          Edit
+        </button>
+        <dialog id="edit-dialog-{{ $record.Id }}">
+          <form hx-put="/shark/{{ $record.Id }}" hx-target="#shark-list">
+            <div>
+              <label for="date">Date</label>
+              <input type="text" name="date" value="{{ $record.Date }}" />
+            </div>
+            <div>
+              <label for="name">Name</label>
+              <input type="text" name="name" value="{{ $record.Name }}" />
+            </div>
+            <div>
+              <label for="country">Country</label>
+              <input type="text" name="country" value="{{ $record.Country }}" />
+            </div>
+            <div>
+              <label for="activity">Activity</label>
+              <input
+                type="text"
+                name="activity"
+                value="{{ $record.Activity }}"
+              />
+            </div>
+            <div>
+              <label for="injury">Injury</label>
+              <input type="text" name="injury" value="{{ $record.Injury }}" />
+            </div>
+            <div>
+              <label for="species">Species</label>
+              <input type="text" name="species" value="{{ $record.Species }}" />
+            </div>
+            <input type="submit" value="Edit" />
+          </form>
+        </dialog>
+        <button
+          hx-delete="/shark/{{ $record.Id }}"
+          hx-target="#shark-list"
+          type="button"
+          style="background-color: tomato; color: white"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </li>
+  <br />
+  {{ end }}
+</ol>
+<br />

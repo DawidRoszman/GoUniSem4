@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shark attacks</title>
+    <script
+      src="https://unpkg.com/htmx.org@1.9.12"
+      integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      body {
+        display: grid;
+        place-items: center;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+      button {
+        border: none;
+        padding: 15px;
+        border-radius: 15px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Welcome to Shark Attacks</h1>
+    <button
+      id="add-element"
+      onclick="(function () {dialog = document.querySelector('#add-dialog');dialog.showModal();})()"
+      style="background-color: #aee246; color: black"
+    >
+      Add new attack
+    </button>
+    <dialog id="add-dialog">
+      <form hx-post="/shark" hx-target="#shark-list">
+        <div>
+          <label for="date">Date</label>
+          <input type="text" name="date" value="" />
+        </div>
+        <div>
+          <label for="name">Name</label>
+          <input type="text" name="name" value="" />
+        </div>
+        <div>
+          <label for="country">Country</label>
+          <input type="text" name="country" value="" />
+        </div>
+        <div>
+          <label for="activity">Activity</label>
+          <input type="text" name="activity" value="" />
+        </div>
+        <div>
+          <label for="injury">Injury</label>
+          <input type="text" name="injury" value="" />
+        </div>
+        <div>
+          <label for="species">Species</label>
+          <input type="text" name="species" value="" />
+        </div>
+        <input
+          type="submit"
+          onclick="(function () {dialog = document.querySelector('#add-dialog');dialog.close();})()"
+          value="Add"
+        />
+      </form>
+    </dialog>
+    <div id="shark-list" hx-get="/shark" hx-trigger="load"></div>
+  </body>
+</html>
