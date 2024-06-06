@@ -1,0 +1,27 @@
+15 May,1973,NBS publishes a first request for a standard encryption algorithm
+27 August,1974,NBS publishes a second request for encryption algorithms
+17 March,1975,DES is published in the Federal Register for comment
+August,1976,First workshop on DES
+September,1976,"Second workshop, discussing mathematical foundation of DES"
+November,1976,DES is approved as a standard
+15 January,1977,DES is published as a FIPS standard FIPS PUB 46
+June,1977,Diffie and Hellman argue that the DES cipher can be broken by brute force.[1]
+,1983,DES is reaffirmed for the first time
+,1986,"Videocipher II, a TV satellite scrambling system based upon DES, begins use by HBO"
+22 January,1988,"DES is reaffirmed for the second time as FIPS 46-1, superseding FIPS PUB 46"
+July,1991,"Biham and Shamir rediscover differential cryptanalysis, and apply it to a 15-round DES-like cryptosystem."
+,1992,"Biham and Shamir report the first theoretical attack with less complexity than brute force: differential cryptanalysis. However, it requires an unrealistic 247 chosen plaintexts."
+30 December,1993,DES is reaffirmed for the third time as FIPS 46-2
+,1994,"The first experimental cryptanalysis of DES is performed using linear cryptanalysis (Matsui, 1994)."
+June,1997,The DESCHALL Project breaks a message encrypted with DES for the first time in public.
+July,1998,The EFF's DES cracker (Deep Crack) breaks a DES key in 56 hours.
+January,1999,"Together, Deep Crack and distributed.net break a DES key in 22 hours and 15 minutes."
+25 October,1999,"DES is reaffirmed for the fourth time as FIPS 46-3, which specifies the preferred use of Triple DES, with single DES permitted only in legacy systems."
+26 November,2001,The Advanced Encryption Standard is published in FIPS 197
+26 May,2002,The AES becomes effective
+26 July,2004,The withdrawal of FIPS 46-3 (and a couple of related standards) is proposed in the Federal Register[23]
+19 May,2005,"NIST withdraws FIPS 46-3 (see Federal Register vol 70, number 96)"
+April,2006,"The FPGA-based parallel machine COPACOBANA of the Universities of Bochum and Kiel, Germany, breaks DES in 9 days at a $10,000 hardware cost.[24] Within a year software improvements reduced the average time to 6.4 days."
+Nov.,2008,"The successor of COPACOBANA, the RIVYERA machine, reduced the average time to less than a single day."
+August,2016,The Open Source password cracking software hashcat added in DES brute force searching on general purpose GPUs. Benchmarking shows a single off the shelf Nvidia GeForce GTX 1080 Ti GPU costing US$1000 recovers a key in an average of 15 days (full exhaustive search taking 30 days). Systems have been built with eight GTX 1080 Ti GPUs which can recover a key in an average of under 2 days.[25]
+July,2017,A chosen-plaintext attack utilizing a rainbow table can recover the DES key for a single specific chosen plaintext 1122334455667788 in 25 seconds. A new rainbow table has to be calculated per plaintext. A limited set of rainbow tables have been made available for download.[26]
